@@ -6,3 +6,7 @@ Player = Class{
       self.cards = cards
     end
 }
+
+function Player:getCards ()
+  return self.cards
+end
