@@ -172,7 +172,17 @@ function Deck:determineBestHand(fiveCards,twoCards)
   allHands = self:buildAllHands(cards)
   bestHands = self:buildBestHands(allHands)
   if #bestHands == 0 then
-    return {Hand(fiveCards, 9)}
+    sortedCards = deck:sortCards(cards)
+    return Hand({sortedCards[3], sortedCards[4], sortedCards[5], sortedCards[6], sortedCards[7],}, 9)
+  else
+    bestHand = bestHands[1]
+    for k,v in pairs(bestHands) do
+      if v:getRanking() < bestHand:getRanking() then
+        bestHand = v
+      elseif v:getRanking() == bestHand:getRanking() and (v:getPoints() > bestHand:getPoints()) then
+        bestHand = v
+      end
+    end
   end
-  return bestHands
+  return bestHand
 end

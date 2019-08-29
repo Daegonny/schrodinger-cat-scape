@@ -49,18 +49,13 @@ end
 function game:enter()
 	for i=1,9, 1 do
 		inGameCards[i] = deck:drawCard(inGameCards)
-		--print(inGameCards[i].value.." of "..inGameCards[i].suit)
 	end
 
 	player = Player(1000, {inGameCards[1], inGameCards[2]})
-	dealer = Dealer({inGameCards[3], inGameCards[4],inGameCards[5], inGameCards[6], inGameCards[7]}, 100, 200)
-
-	--suit = "hearts"
-	--testCards = {Card(3, "hearts"), Card(3, "clubs"), Card(3, "spades"), Card(3, suit), Card(1, "diamonds")}
-	--print(deck:is4ofaKind(deck:sortCards(testCards)))
+	rival = Player(1000, {inGameCards[3], inGameCards[4]})
+	dealer = Dealer({inGameCards[5], inGameCards[6],inGameCards[7], inGameCards[8], inGameCards[9]}, 100, 200)
 
 	print("Meowww Let's play poker!!!")
-
 
 end
 
@@ -83,6 +78,10 @@ function preflop:enter()
 	print("player cards")
 	print(player.cards[1].value.." of "..player.cards[1].suit)
 	print(player.cards[2].value.." of "..player.cards[2].suit)
+	print("--------------------------------")
+	print("rival cards")
+	print(rival.cards[1].value.." of "..rival.cards[1].suit)
+	print(rival.cards[2].value.." of "..rival.cards[2].suit)
 	print("--------------------------------")
 end
 
@@ -166,12 +165,15 @@ end
 function showdown:enter()
 	print("-----------Hands-----------------")
 	playerBestHand = deck:determineBestHand(dealer:getCards(), player:getCards())
-	for k,v in pairs(playerBestHand) do
-		print("---")
-		deck:showCards(v:getCards())
-		print("Ranking: "..v:getRanking().." Points: "..v:getPoints())
-		print("---")
-	end
+	rivalBestHand = deck:determineBestHand(dealer:getCards(), rival:getCards())
+
+	print("--Player have "..playerBestHand:getName().."--")
+	deck:showCards(playerBestHand:getCards())
+	print("Ranking: "..playerBestHand:getRanking().." Points: "..playerBestHand:getPoints())
+
+	print("--Rival has "..rivalBestHand:getName().."--")
+	deck:showCards(rivalBestHand:getCards())
+	print("Ranking: "..rivalBestHand:getRanking().." Points: "..rivalBestHand:getPoints())
 	print("--------------------------------")
 end
 
