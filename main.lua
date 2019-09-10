@@ -1,38 +1,23 @@
 --imports
 Gamestate = require 'lib.gamestate'
-lovebird =  require "lib.lovebird"
 require('class.background')
-require('class.screen')
-require('class.card')
-require('class.deck')
+require('class.direction')
 require('class.player')
-require('class.dealer')
+require('class.obstacle')
+require('class.god')
 
 --states
 game = {}
-
---substates
-preflop = {}
-flop = {}
-turn = {}
-river = {}
-showdown = {}
+gameOver = {}
 
 --love bare functions
 function love.load()
-
-	math.randomseed(os.time())
-
-  --screen
-	screen = Screen(loader)
-
   --GameState essential functions
 	Gamestate.registerEvents()
   Gamestate.switch(game)
 end
 
 function love.update(dt)
-	lovebird.update()
 end
 
 function love.draw()
@@ -42,147 +27,56 @@ end
 --state game
 
 function game:init()
-	deck = Deck()
-	inGameCards = {}
+	--creation 4 directions
+  dir_down = Direction("down", 0, 1)
+  dir_right = Direction("right", 1, 0)
+  dir_up = Direction("up", 0, -1)
+  dir_left = Direction("left", -1, 0)
+  directions = {right = dir_right, left = dir_left, up = dir_up, down = dir_down}
 end
 
 function game:enter()
-	for i=1,9, 1 do
-		inGameCards[i] = deck:drawCard(inGameCards)
-	end
-
-	player = Player(1000, {inGameCards[1], inGameCards[2]})
-	rival = Player(1000, {inGameCards[3], inGameCards[4]})
-	dealer = Dealer({inGameCards[5], inGameCards[6],inGameCards[7], inGameCards[8], inGameCards[9]}, 100, 200)
-
-	print("Meowww Let's play poker!!!")
-
+	player = Player(300, 29, "Balinho", directions,  {up = "up", down = "down", left = "left", right = "right"})
+	obstacles = {Obstacle(), Obstacle(), Obstacle(), Obstacle(), Obstacle(), Obstacle()}
+	god = God()
 end
 
 function game:update(dt)
+	player:update(dt)
+	god:updateObstacles(obstacles, dt)
+	if not god:isPlayerAlive(player, obstacles) then
+		--Gamestate.switch(gameOver)
+	end
 end
 
 function game:draw()
+	player:draw()
+	god:drawObstacles(obstacles)
 end
 
 function game:keyreleased(key,code)
+	player:keyreleased(key, code)
 	if key == 'space' then
-		Gamestate.switch(preflop)
+	--	Gamestate.switch(preflop)
 	end
 end
 
-------------------------------------------------
---state preflop
-function preflop:enter()
-	print("-----------pre flop-------------")
-	print("player cards")
-	print(player.cards[1].value.." of "..player.cards[1].suit)
-	print(player.cards[2].value.." of "..player.cards[2].suit)
-	print("--------------------------------")
-	print("rival cards")
-	print(rival.cards[1].value.." of "..rival.cards[1].suit)
-	print(rival.cards[2].value.." of "..rival.cards[2].suit)
-	print("--------------------------------")
+-----------------------------------
+--state gameOver
+
+function gameOver:enter()
 end
 
-function preflop:update(dt)
+function gameOver:update(dt)
 end
 
-function preflop:draw()
+function gameOver:draw()
+	love.graphics.print("\'Cê perdeu, zé.", 0,0)
 end
 
-function preflop:keyreleased(key,code)
+function gameOver:keyreleased(key,code)
+	player:keyreleased(key, code)
 	if key == 'space' then
-		Gamestate.switch(river)
+		Gamestate.switch(game)
 	end
-end
-
-------------------------------------------------
---state flop
-function flop:enter()
-	print("-----------flop-----------------")
-	print("table cards")
-	dealer:showCards(3)
-	print("--------------------------------")
-end
-
-function flop:update(dt)
-end
-
-function flop:draw()
-end
-
-function flop:keyreleased(key,code)
-	if key == 'space' then
-		Gamestate.switch(turn)
-	end
-end
-
-------------------------------------------------
---state turn
-function turn:enter()
-	print("-----------turn-----------------")
-	print("table cards")
-	dealer:showCards(4)
-	print("--------------------------------")
-end
-
-function turn:update(dt)
-end
-
-function turn:draw()
-end
-
-function turn:keyreleased(key,code)
-	if key == 'space' then
-		Gamestate.switch(river)
-	end
-end
-
-------------------------------------------------
---state river
-function river:enter()
-	print("-----------river-----------------")
-	print("table cards")
-	dealer:showCards(5)
-	print("--------------------------------")
-end
-
-function river:update(dt)
-end
-
-function river:draw()
-end
-
-function river:keyreleased(key,code)
-	if key == 'space' then
-		Gamestate.switch(showdown)
-	end
-end
-
-------------------------------------------------
---state showdown
-function showdown:enter()
-	print("-----------Hands-----------------")
-	playerBestHand = deck:determineBestHand(dealer:getCards(), player:getCards())
-	rivalBestHand = deck:determineBestHand(dealer:getCards(), rival:getCards())
-
-	print("--Player have "..playerBestHand:getName().."--")
-	deck:showCards(playerBestHand:getCards())
-	print("Ranking: "..playerBestHand:getRanking().." Points: "..playerBestHand:getPoints())
-
-	print("--Rival has "..rivalBestHand:getName().."--")
-	deck:showCards(rivalBestHand:getCards())
-	print("Ranking: "..rivalBestHand:getRanking().." Points: "..rivalBestHand:getPoints())
-	print("--------------------------------")
-end
-
-function showdown:update(dt)
-end
-
-function showdown:draw()
-end
-
-function showdown:keyreleased(key,code)
-
 end
