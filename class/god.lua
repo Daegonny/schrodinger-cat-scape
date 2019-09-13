@@ -15,9 +15,19 @@ function God:isCollidingBoxes (box1, box2)
   return isCollidingX and isCollidingY
 end
 
-function God:updateObstacles(obstacles, dt)
+function God:updateObstacles(obstacles, background, dt)
+  numObstacles = #obstacles
+  levelCounter = 0
   for k, obstacle in pairs(obstacles) do
       obstacle:update(dt)
+      levelCounter = levelCounter + obstacle:getLevel()
+  end
+  if levelCounter == numObstacles then
+    for k, obstacle in pairs(obstacles) do
+        obstacle:setLevel(0)
+        obstacle:increaseVm()
+        background:increaseVm()
+    end
   end
 end
 
@@ -28,9 +38,11 @@ function God:drawObstacles(obstacles)
 end
 
 function God:isPlayerAlive(player, obstacles)
-  for k, obstacle in ipairs(obstacles) do
-    if self:isCollidingBoxes(player, obstacle) then
-      return false
+  if not player.isGhost then
+    for k, obstacle in ipairs(obstacles) do
+      if self:isCollidingBoxes(player, obstacle) then
+        return false
+      end
     end
   end
   return true
