@@ -12,7 +12,13 @@ https://github.com/fegemo/cefet-games/blob/v2/assignments/tp1-ra-14-4/README.md
 O gato de Schrödinger pode estar morto e vivo simultanamente e isto acabou trazendo este
 experimento hipotético para a cultura pop. No jogo você controla Balinho, o gato que saiu da caixa
 e tenta fugir do laboratório. Para isto você teria de evitar os assustadores pepinos, pulando ou
-assumindo a forma de fantasma (intangível). A dificuldade é baseada na velocidade e é progressiva. Quanto mais tempo jogado, mais pontos.  
+assumindo a forma de fantasma (intangível). Durante a corrida, sua barra de energia se enche e ela lhe permite mudar de forma. A dificuldade é baseada na velocidade e é progressiva. Quanto mais tempo jogado, mais pontos.  
+
+## Controles
+* Up -> salta
+* G -> ativa modo fantasma se houver energia suficiente
+* Space -> inicia uma nova partida, pausa ou retorna o jogo
+* Esc -> retorna a tela inicial
 
 ## Créditos
  * Desenvolvido por Ígor Chagas Marques (igorchagasm@hotmail.com)
