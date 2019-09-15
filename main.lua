@@ -5,7 +5,6 @@ require('class.direction')
 require('class.player')
 require('class.obstacle')
 require('class.god')
-require('class.screen')
 
 --states
 menu = {}
@@ -16,7 +15,6 @@ pause = {}
 --love bare functions
 function love.load()
   --GameState essential functions
-	screen = Screen()
 	Gamestate.registerEvents()
   Gamestate.switch(menu)
 	music = love.audio.newSource("assets/audio/musica.wav", "static")
@@ -26,6 +24,7 @@ function love.update(dt)
 end
 
 function love.draw()
+
 end
 
 ------------------------------------------------
@@ -35,13 +34,19 @@ function menu:init()
 end
 
 function menu:enter()
+	bgMenu = Background(0,0,"assets/img/states-splash.png")
 end
 
 function menu:update(dt)
 end
 
 function menu:draw()
-
+	bgMenu:draw()
+	love.graphics.setColor(0, 0, 0)
+	love.graphics.print("Press Space to play the game!", 450,8)
+	love.graphics.print("Press Up to jump over cucumbers.", 450,22)
+	love.graphics.print("Press G to be ghost and avoid cucumbers.", 450,34)
+	love.graphics.setColor(1, 1, 1)
 end
 
 function menu:keyreleased(key,code)
