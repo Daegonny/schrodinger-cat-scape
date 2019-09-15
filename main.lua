@@ -19,6 +19,7 @@ function love.load()
 	screen = Screen()
 	Gamestate.registerEvents()
   Gamestate.switch(menu)
+	music = love.audio.newSource("assets/audio/musica.wav", "static")
 end
 
 function love.update(dt)
@@ -34,16 +35,13 @@ function menu:init()
 end
 
 function menu:enter()
-	--bgPaused = Background(0,0,"assets/img/states-paused.png")
 end
 
 function menu:update(dt)
 end
 
 function menu:draw()
-	--bgPaused:draw()
-	--love.graphics.print("Current Score: "..math.floor(player:getScore()), 500,15)
-	--love.graphics.print("Press Space to resume game!", 500,30)
+
 end
 
 function menu:keyreleased(key,code)
@@ -59,6 +57,11 @@ end
 function game:enter()
 	bgGame = Background(0,0,"assets/img/states-game.png")
 	bgGame:reset()
+
+	music:setLooping(true)
+	music:setVolume(0.4)
+	music:play()
+
 	--creation 4 directions
 	dir_down = Direction("down", 0, 1)
 	dir_right = Direction("right", 1, 0)
@@ -76,6 +79,8 @@ function game:update(dt)
 	god:updateObstacles(obstacles, bgGame, dt)
 	if not god:isPlayerAlive(player, obstacles) then
 		Gamestate.switch(gameOver)
+		player.scream:play()
+		music:stop()
 	end
 end
 
@@ -88,6 +93,11 @@ end
 function game:keyreleased(key,code)
 	player:keyreleased(key, code)
 	if key == 'space' then
+		music:pause()
+		if player.isGhost then
+			player.ghostSound:pause()
+			player.whisper:pause()
+		end
 		Gamestate.push(pause)
 	end
 end
@@ -139,6 +149,7 @@ end
 function pause:keyreleased(key,code)
 	player:keyreleased(key, code)
 	if key == 'space' then
+		music:play()
 		Gamestate.pop()
 	end
 	if key == 'escape' then

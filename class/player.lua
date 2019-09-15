@@ -6,8 +6,8 @@ Player = Class{
     self.x = x
     self.y = y
     self.name = name
-    self.vj = 200
-    self.vf = 200
+    self.vj = 250
+    self.vf = 250
     self.w = 16
     self.h = 25
     self.score = 0
@@ -18,15 +18,34 @@ Player = Class{
     self.directions = directions
     self.control_keys = control_keys
     --set jump and ground vars
-    self.jump_limit = 0 - 2 * self.h
+    self.jump_limit = 0 - 1.8 * self.h
     self.fall_limit = y
     self.positions = {ground =  0, jump = 1, fall = 2}
     self.position_current = self.positions["ground"]
     --set animations from sprite sheet
-    self:setup_sheets()
-    self:setup_animations()
+    self:setupSheets()
+    self:setupAnimations()
+    self:setupSounds()
+
   end
 }
+
+function Player:setupSounds()
+  self.meow = love.audio.newSource("assets/audio/miau.mp3", "static")
+  self.scream = love.audio.newSource("assets/audio/grito.wav", "static")
+  self.whisper = love.audio.newSource("assets/audio/sussuro.wav", "static")
+  self.ghostSound = love.audio.newSource("assets/audio/fantasma.wav", "static")
+  self.charged = love.audio.newSource("assets/audio/carregado.ogg", "static")
+  self.ghostSound:setLooping(true)
+  self.whisper:setLooping(true)
+
+  self.meow:setVolume(0.4)
+  self.scream:setVolume(0.4)
+  self.whisper:setVolume(0.4)
+  self.ghostSound:setVolume(0.4)
+  self.charged:setVolume(0.4)
+
+end
 
 function Player:getScore()
   return self.score
@@ -53,7 +72,13 @@ function Player:getH()
   return self.h
 end
 
-function Player:setup_sheets()
+function Player:try2meow()
+  if math.random(1, 5) == 1 then
+    player.meow:play()
+  end
+end
+
+function Player:setupSheets()
   self.imgs = {}
   self.imgs["run"] = love.graphics.newImage("assets/img/cat-run.png")
   self.imgs["run-ghost"] = love.graphics.newImage("assets/img/cat-run-ghost.png")
@@ -62,10 +87,10 @@ function Player:setup_sheets()
   self.img_current = self.imgs["run"]
 end
 
-function Player:setup_animations()
+function Player:setupAnimations()
   self.animations = {}
   self.grid = anim8.newGrid(self.w, self.h, self.imgs["run"]:getWidth(), self.imgs["run"]:getHeight())
-  self.animations.run = anim8.newAnimation(self.grid('1-8',1), 0.1)
+  self.animations.run = anim8.newAnimation(self.grid('1-8',1), 0.05)
   self.animations.jump = anim8.newAnimation(self.grid('1-8',1), 0.05)
   self.animation = self.animations.run
 end
@@ -103,6 +128,7 @@ end
 function Player:check_is_jumping(dt)
   if  self.position_current ~= self.positions["fall"] and love.keyboard.isDown(self.control_keys.up) then
     self.position_current = self.positions["jump"]
+
     self:jump(self.directions.up, dt)
   end
 end
@@ -117,6 +143,7 @@ function Player:check_is_on_ground()
   if self.position_current == self.positions["fall"] and self.y >= self.fall_limit then
     self.position_current = self.positions["ground"]
     self.y = self.fall_limit
+    self:try2meow()
   end
 end
 
@@ -143,14 +170,6 @@ function Player:determine_sprite()
   end
 end
 
-function Player:keyreleased(key, code)
-   if key == self.control_keys.up then
-      self.position_current = self.positions["fall"]
-   end
-   if key == self.control_keys.ghost and self:canBeGhost() then
-      self.isGhost = true
-   end
-end
 
 function Player:canBeGhost()
   return self.ghostPoints >= 5
@@ -159,12 +178,27 @@ end
 function Player:handleGhost(dt)
   if self.isGhost then
     self.ghostPoints = self.ghostPoints - 5*dt
+    self.ghostSound:play()
+    self.whisper:play()
+
+    if self.ghostPoints > self.maxGhostPoints/3 then
+      self.whisper:setVolume(0.4)
+      self.ghostSound:setVolume(0.4)
+    elseif self.ghostPoints <= self.maxGhostPoints/3 then
+      self.whisper:setVolume(0.9)
+      self.ghostSound:setVolume(0.9)
+    end
     if self.ghostPoints <= 0 then
       self.isGhost = false
       self.ghostPoints = 0
+      self.ghostSound:stop()
+      self.whisper:stop()
     end
   elseif self.ghostPoints < self.maxGhostPoints then
     self.ghostPoints = self.ghostPoints + 5*dt
+    if self.ghostPoints >= self.maxGhostPoints then
+      self.charged:play()
+    end
   end
 end
 
@@ -193,4 +227,13 @@ function Player:draw()
   -- love.graphics.rectangle("line", self.x, self.y, self.w, self.h)
   self.animation:draw(self.img_current, self.x, self.y)
   self:drawPoints()
+end
+
+function Player:keyreleased(key, code)
+  if key == self.control_keys.up then
+    self.position_current = self.positions["fall"]
+  end
+  if key == self.control_keys.ghost and self:canBeGhost() then
+    self.isGhost = true
+  end
 end
