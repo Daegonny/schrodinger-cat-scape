@@ -28,6 +28,7 @@ assumindo a forma de fantasma (intangível). Durante a corrida, sua barra de ene
 ## Sprites
 * https://www.gameart2d.com/cat-and-dog-free-sprites.html
 * https://henrysoftware.itch.io/pixel-food
+* https://mutantleg.itch.io/lab 
 
 ## Audios
 * 316797__dimbark1__ghostly-whispers.wav
